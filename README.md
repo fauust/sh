@@ -5,7 +5,7 @@
 A shell parser, formatter, and interpreter. Supports [POSIX Shell], [Bash], and
 [mksh]. Requires Go 1.14 or later.
 
-### Quick start
+## Quick start
 
 To parse shell scripts, inspect them, and print them out, see the [syntax
 examples](https://pkg.go.dev/mvdan.cc/sh/v3/syntax#pkg-examples).
@@ -13,14 +13,18 @@ examples](https://pkg.go.dev/mvdan.cc/sh/v3/syntax#pkg-examples).
 For high-level operations like performing shell expansions on strings, see the
 [shell examples](https://pkg.go.dev/mvdan.cc/sh/v3/shell#pkg-examples).
 
-### shfmt
+## shfmt
 
-	GO111MODULE=on go get mvdan.cc/sh/v3/cmd/shfmt
+```console
+GO111MODULE=on go get mvdan.cc/sh/v3/cmd/shfmt
+```
 
 `shfmt` formats shell programs. See [canonical.sh](syntax/canonical.sh) for a
 quick look at its default style. For example:
 
-	shfmt -l -w script.sh
+```console
+shfmt -l -w script.sh
+```
 
 For more information, see [its manpage](cmd/shfmt/shfmt.1.scd), which can be
 viewed directly as Markdown or rendered with [scdoc].
@@ -28,84 +32,92 @@ viewed directly as Markdown or rendered with [scdoc].
 Packages are available on [Alpine], [Arch], [Docker], [FreeBSD], [Homebrew],
 [MacPorts], [NixOS], [Scoop], [Snapcraft], [Void] and [webi].
 
-### gosh
+## gosh
 
-	GO111MODULE=on go get mvdan.cc/sh/v3/cmd/gosh
+```console
+GO111MODULE=on go get mvdan.cc/sh/v3/cmd/gosh
+```
 
 Proof of concept shell that uses `interp`. Note that it's not meant to replace a
 POSIX shell at the moment, and its options are intentionally minimalistic.
 
-### Fuzzing
+## Fuzzing
 
 This project makes use of [go-fuzz] to find crashes and hangs in both the parser
 and the printer. The `fuzz-corpus` branch contains a corpus to get you started.
 For example:
 
-	git checkout fuzz-corpus
-	./fuzz
-
-### Caveats
-
-* When indexing Bash associative arrays, always use quotes. The static parser
-  will otherwise have to assume that the index is an arithmetic expression.
-
-```sh
-$ echo '${array[spaced string]}' | shfmt
-1:16: not a valid arithmetic operator: string
-$ echo '${array[dash-string]}' | shfmt
-${array[dash - string]}
+```console
+git checkout fuzz-corpus
+./fuzz
 ```
 
-* `$((` and `((` ambiguity is not supported. Backtracking would complicate the
+## Caveats
+
+- When indexing Bash associative arrays, always use quotes. The static parser
+  will otherwise have to assume that the index is an arithmetic expression.
+
+  ```sh
+  $ echo '${array[spaced string]}' | shfmt
+  1:16: not a valid arithmetic operator: string
+  $ echo '${array[dash-string]}' | shfmt
+  ${array[dash - string]}
+  ```
+
+- `$((` and `((` ambiguity is not supported. Backtracking would complicate the
   parser and make streaming support via `io.Reader` impossible. The POSIX spec
   recommends to [space the operands][posix-ambiguity] if `$( (` is meant.
 
-```sh
-$ echo '$((foo); (bar))' | shfmt
-1:1: reached ) without matching $(( with ))
-```
+  ```sh
+  $ echo '$((foo); (bar))' | shfmt
+  1:1: reached ) without matching $(( with ))
+  ```
 
-* Some builtins like `export` and `let` are parsed as keywords. This allows
+- Some builtins like `export` and `let` are parsed as keywords. This allows
   statically building their syntax tree, as opposed to keeping the arguments as
   a slice of words. Note that this means expansions like `declare {a,b}=c` are
   not supported.
 
-### JavaScript
+## JavaScript
 
 A subset of the Go packages are available as an npm package called [mvdan-sh].
-See the [_js](_js) directory for more information.
+See the [\_js](_js) directory for more information.
 
-### Docker
+## Docker
 
 To build a Docker image, checkout a specific version of the repository and run:
 
-	docker build -t my:tag -f cmd/shfmt/Dockerfile .
+```console
+docker build -t my:tag -f cmd/shfmt/Dockerfile .
+```
 
 This creates an image that only includes shfmt. Alternatively, if you want an
 image that includes alpine, add `--target alpine`.
 To use the Docker image, run:
 
-	docker run --rm -v $PWD:/mnt -w /mnt my:tag <shfmt arguments>
+```console
+docker run --rm -v $PWD:/mnt -w /mnt my:tag <shfmt arguments>
+```
 
-### pre-commit
+## pre-commit
 
 It is possible to use shfmt with [pre-commit][pre-commit] and a `local`
 repo configuration like:
 
 ```yaml
-  - repo: local
-    hooks:
-      - id: shfmt
-        name: shfmt
-        minimum_pre_commit_version: 2.4.0
-        language: golang
-        additional_dependencies: [mvdan.cc/sh/v3/cmd/shfmt@v3.2.0]
-        entry: shfmt
-        args: [-w]
-        types: [shell]
+- repo: local
+  hooks:
+    - id: shfmt
+      name: shfmt
+      minimum_pre_commit_version: 2.4.0
+      language: golang
+      additional_dependencies: [mvdan.cc/sh/v3/cmd/shfmt@v3.2.0]
+      entry: shfmt
+      args: [-w]
+      types: [shell]
 ```
 
-### Related projects
+## Related projects
 
 The following editor integrations wrap `shfmt`:
 
